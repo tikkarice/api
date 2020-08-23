@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>signup</title>
+  <style>
+    .container {
+      display: flex;
+      justify-content: center;
+      height: 400px;
+    }
+    .form-container {
+      align-self: center;
+      padding-top: 10px;
+      background-image: linear-gradient(-45deg, #ff0000, #ffc744);
+      display: flex;
+      flex-direction: column;
+      flex-basis: 75%;
+    }
+    .column {
+      flex-grow: 1;
+      margin-bottom: 8px;
+      display: flex;
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+    .name-field {
+      flex-grow: 1;
+      height:40px;
+    }
+    .pwd-field {
+      flex-grow: 1;
+      height: 40px;
+    }
+    .submit-btn {
+      align-self: center;
+      height:30px;
+      flex-grow: 1;
+    }
+    .hidden {
+      display: none;
+    }
+    .msg-text {
+      color: black;
+      font-size: 13px;
+    }
+    .column-signup {
+      flex-grow: 1;
+      background-color: whitesmoke;
+      padding: 10px 0px 10px 0px;
+    }
+    .signup {
+      color: blue;
+      justify-content: end;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="form-container">
+      <div class="column">
+        <input class="name-field" type="text" name="fname" placeholder="first name" />
+      </div>
+      <div class="column">
+        <input class="name-field" type="text" name="lname" placeholder="last name" />
+      </div>
+       <div class="column">
+        <input class="name-field" type="text" name="email" placeholder="email" />
+      </div>
+      <div class="column">
+        <input class="pwd-field" type="password" name="password" placeholder="Password" />
+      </div>
+      <div class="column">
+        <input class="pwd-field" type="password" name="verify-password" placeholder="verify password" />
+      </div>
+      <div class="column">
+        <button id="btn" class="submit-btn">signup</button>
+      </div>
+      <div id="msg-container" class="column hidden">
+        <p class="msg-text"></p>
+      </div>
+      <div class="column-signup">
+        <span class="signup" onclick="navigate('login')">Login</span>
+      </div>
+    </div>
+  </div>
+</body>
+<!--Load tscript when dom is loaded-->
+<script type="text/javascript">
+  // Function defination should be on top
+  const sendCredentailsToServer = () => {
+    const fname = document.querySelectorAll('input[name=fname]')[0].value || '';
+    const lname = document.querySelectorAll('input[name=lname]')[0].value || '';
+    const email = document.querySelectorAll('input[name=email]')[0].value || '';
+    const password = document.querySelectorAll('input[name=password]')[0].value || '';
+    const verifyPassword = document.querySelectorAll('input[name=verify-password]')[0].value || '';
+    const message = document.querySelectorAll('.msg-text')[0];
+    const msgContainer = document.getElementById('msg-container');
+    //debugger;
+    if (password !== verifyPassword) {
+        message.textContent = "password and verify password should be same";
+        msgContainer.style.display = 'block';
+        return;
+    } else {
+        message.textContent = "";
+        msgContainer.style.display = 'hidden';
+    }
+    fetch('/signup', {
+      method: 'post',
+      headers: {
+        "Content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+      },
+      body: `fname=${fname}&lname=${lname}&email=${email}&password=${password}&confirmPassword=${verifyPassword}`,
+    })
+    .then(async (response) => {
+      const data = await response.json();
+      if (data.errorCode === 1) {
+          message.textContent = data.msg;
+          msgContainer.style.display = 'block';
+      } else {
+          message.textContent = "";
+          msgContainer.style.display = 'hidden';
+          window.location.href = '/';
+      }
+      console.log(data);
+    });
+  }
+
+  const navigate = (action) => {
+    console.log('action', action);
+    window.location.href = '/';
+  };
+
+  // Add event Listner to button
+  document.getElementById('btn').addEventListener('click', sendCredentailsToServer);
+</script>
+</html>
